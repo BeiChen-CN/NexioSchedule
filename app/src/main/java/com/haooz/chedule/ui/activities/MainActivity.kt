@@ -134,6 +134,7 @@ import com.haooz.chedule.ui.components.CourseCard
 import com.haooz.chedule.ui.components.LandRippleSpec
 import com.haooz.chedule.ui.components.LocalLandRipple
 import com.haooz.chedule.ui.components.ScheduleBottomBar
+import com.haooz.chedule.ui.theme.rememberAppThemeController
 import com.haooz.chedule.ui.components.ScheduleTopBar
 import com.haooz.chedule.ui.components.ShareImportDialog
 import com.haooz.chedule.ui.components.UpdateDialog
@@ -192,9 +193,7 @@ import top.yukonga.miuix.kmp.icon.extended.More
 import top.yukonga.miuix.kmp.icon.extended.Paste
 import top.yukonga.miuix.kmp.overlay.OverlayDialog
 import top.yukonga.miuix.kmp.squircle.addSquircleRect
-import top.yukonga.miuix.kmp.theme.ColorSchemeMode
 import top.yukonga.miuix.kmp.theme.MiuixTheme
-import top.yukonga.miuix.kmp.theme.ThemeController
 import top.yukonga.miuix.kmp.utils.MiuixPopupUtils.Companion.MiuixPopupHost
 import java.time.LocalDate
 import java.util.Calendar
@@ -2820,6 +2819,7 @@ fun CourseScheduleApp(privacyConsented: Boolean = true) {
                                 selectedTab = selectedTab,
                                 onTabSelected = { idx ->
                                     if (idx != selectedTab) {
+                                        hapticFeedback.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                                         // 先锁 programmatic，只改高亮目标，避免动画中途被拉回
                                         mainTabProgrammatic = true
                                         selectedTab = idx
@@ -3332,13 +3332,7 @@ fun CourseScheduleApp(privacyConsented: Boolean = true) {
                                         (settingsPageIndex - scrollPos)
                                     }
                                 }
-                                val settingsCoverController = remember {
-                                    ThemeController(
-                                        if (appSettingDark) ColorSchemeMode.Dark else ColorSchemeMode.Light
-                                    )
-                                }
-                                settingsCoverController.colorSchemeMode =
-                                    if (appSettingDark) ColorSchemeMode.Dark else ColorSchemeMode.Light
+                                val settingsCoverController = rememberAppThemeController(isDark = appSettingDark)
                                 MiuixTheme(controller = settingsCoverController) {
                                     Box(
                                         modifier = Modifier
@@ -3381,11 +3375,7 @@ fun CourseScheduleApp(privacyConsented: Boolean = true) {
                                             // 今日页主题预先固定，切 tab 不跟着 chrome 闪一帧
                                             val todayForced = if (captureThemeActive) captureThemeIsDark else todayPageForcedDark
                                             val todayDark = todayForced ?: appSettingDark
-                                            val todayThemeController = remember {
-                                                ThemeController(if (todayDark) ColorSchemeMode.Dark else ColorSchemeMode.Light)
-                                        }
-                                        todayThemeController.colorSchemeMode =
-                                            if (todayDark) ColorSchemeMode.Dark else ColorSchemeMode.Light
+                                            val todayThemeController = rememberAppThemeController(isDark = todayDark)
                                         MiuixTheme(controller = todayThemeController) {
                                             CompositionLocalProvider(LocalForcedDarkTheme provides todayForced) {
                                         TodayScreen(
@@ -3435,11 +3425,7 @@ fun CourseScheduleApp(privacyConsented: Boolean = true) {
                                     1 -> {
                                         val scheduleForced = if (captureThemeActive) captureThemeIsDark else wallpaperForcedDark
                                         val scheduleDark = scheduleForced ?: appSettingDark
-                                        val scheduleThemeController = remember {
-                                            ThemeController(if (scheduleDark) ColorSchemeMode.Dark else ColorSchemeMode.Light)
-                                        }
-                                        scheduleThemeController.colorSchemeMode =
-                                            if (scheduleDark) ColorSchemeMode.Dark else ColorSchemeMode.Light
+                                        val scheduleThemeController = rememberAppThemeController(isDark = scheduleDark)
                                         MiuixTheme(controller = scheduleThemeController) {
                                             CompositionLocalProvider(LocalForcedDarkTheme provides scheduleForced) {
                                         CompositionLocalProvider(
@@ -3849,11 +3835,7 @@ fun CourseScheduleApp(privacyConsented: Boolean = true) {
                                     2 -> {
                                         // 设置页始终跟应用主题，不被壁纸锁深色
                                         val settingsDark = appSettingDark
-                                        val settingsThemeController = remember {
-                                            ThemeController(if (settingsDark) ColorSchemeMode.Dark else ColorSchemeMode.Light)
-                                        }
-                                        settingsThemeController.colorSchemeMode =
-                                            if (settingsDark) ColorSchemeMode.Dark else ColorSchemeMode.Light
+                                        val settingsThemeController = rememberAppThemeController(isDark = settingsDark)
                                         MiuixTheme(controller = settingsThemeController) {
                                             CompositionLocalProvider(LocalForcedDarkTheme provides settingsPageForcedDark) {
                                         SettingsScreen(
@@ -4116,9 +4098,7 @@ fun CourseScheduleApp(privacyConsented: Boolean = true) {
 
                     // 始终跟随应用主题，不受壁纸强制主题影响
                     val appDialogDark = rememberAppSettingDark()
-                    val appDialogController = remember(appDialogDark) {
-                        ThemeController(if (appDialogDark) ColorSchemeMode.Dark else ColorSchemeMode.Light)
-                    }
+                    val appDialogController = rememberAppThemeController(isDark = appDialogDark)
                     MiuixTheme(controller = appDialogController) {
                         CompositionLocalProvider(LocalForcedDarkTheme provides null) {
                             val addDialogDefaultWeeks by viewModel.addDialogDefaultWeeks.collectAsState()
@@ -4402,12 +4382,7 @@ fun CourseScheduleApp(privacyConsented: Boolean = true) {
             // 始终用 MiuixTheme 包裹保持结构恒定；ThemeController 原地切 mode，重建实例会卡一帧
             val effectiveForcedDark = if (captureThemeActive) captureThemeIsDark else forcedDark
             val effectiveDark = effectiveForcedDark ?: appSettingDark
-            val pageController = remember {
-                ThemeController(if (effectiveDark) ColorSchemeMode.Dark else ColorSchemeMode.Light)
-            }
-            // 组合期同步 mode：SideEffect 在本帧绘制后才执行，切 tab 会闪一帧旧主题
-            pageController.colorSchemeMode =
-                if (effectiveDark) ColorSchemeMode.Dark else ColorSchemeMode.Light
+            val pageController = rememberAppThemeController(isDark = effectiveDark)
             MiuixTheme(controller = pageController) {
                 CompositionLocalProvider(LocalForcedDarkTheme provides effectiveForcedDark) {
                     scaffoldContent()
@@ -4477,13 +4452,7 @@ fun CourseScheduleApp(privacyConsented: Boolean = true) {
                                 (settingsChromePageIndex - scrollPos)
                             }
                         }
-                        val settingsChromeController = remember {
-                            ThemeController(
-                                if (appSettingDark) ColorSchemeMode.Dark else ColorSchemeMode.Light
-                            )
-                        }
-                        settingsChromeController.colorSchemeMode =
-                            if (appSettingDark) ColorSchemeMode.Dark else ColorSchemeMode.Light
+                        val settingsChromeController = rememberAppThemeController(isDark = appSettingDark)
                         MiuixTheme(controller = settingsChromeController) {
                             Box(
                                 modifier = Modifier
@@ -4517,12 +4486,7 @@ fun CourseScheduleApp(privacyConsented: Boolean = true) {
         // 浮层主题跟壁纸/应用设置
         val overlayEffectiveForcedDark = if (captureThemeActive) captureThemeIsDark else forcedDark
         val overlayEffectiveDark = overlayEffectiveForcedDark ?: appSettingDark
-        val overlayPageController = remember {
-            ThemeController(if (overlayEffectiveDark) ColorSchemeMode.Dark else ColorSchemeMode.Light)
-        }
-        // 组合期同步 mode：SideEffect 会晚一帧
-        overlayPageController.colorSchemeMode =
-            if (overlayEffectiveDark) ColorSchemeMode.Dark else ColorSchemeMode.Light
+        val overlayPageController = rememberAppThemeController(isDark = overlayEffectiveDark)
         // 无壁纸时浮层垫课程表页底色（与网格课程卡同一份，取值见 courseCardSolidBacking）
         val floatSolidBacking = courseCardSolidBacking(
             isDark = isAppDarkTheme(),
@@ -5714,12 +5678,7 @@ private fun PageLockedTopBarTheme(
 ) {
     val appDark = rememberAppSettingDark()
     val pageDark = pageForcedDark ?: appDark
-    val controller = remember {
-        ThemeController(if (pageDark) ColorSchemeMode.Dark else ColorSchemeMode.Light)
-    }
-    // 组合期同步 mode：SideEffect 等本帧绘制后才执行，切页会闪一帧旧主题
-    controller.colorSchemeMode =
-        if (pageDark) ColorSchemeMode.Dark else ColorSchemeMode.Light
+    val controller = rememberAppThemeController(isDark = pageDark)
     MiuixTheme(controller = controller) {
         CompositionLocalProvider(LocalForcedDarkTheme provides pageForcedDark) {
             content()
@@ -5739,11 +5698,7 @@ private fun SettingsTopBar(
     val isTablet = navBarStyle == "rail"
     // 仅设置页顶栏锁应用主题，避免切页时渐变/糊层随课程表壁纸锁色跳变
     val settingsBarDark = rememberAppSettingDark()
-    val settingsBarController = remember {
-        ThemeController(if (settingsBarDark) ColorSchemeMode.Dark else ColorSchemeMode.Light)
-    }
-    settingsBarController.colorSchemeMode =
-        if (settingsBarDark) ColorSchemeMode.Dark else ColorSchemeMode.Light
+    val settingsBarController = rememberAppThemeController(isDark = settingsBarDark)
 
     // 平板设置：渐变画在 TabletSettingsScreen 内容层，这里不再叠全宽遮罩
     MiuixTheme(controller = settingsBarController) {

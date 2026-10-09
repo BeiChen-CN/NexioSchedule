@@ -5,6 +5,7 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.PackageManager
+import android.os.Build
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -54,6 +55,7 @@ import com.haooz.chedule.ui.basic.SharedScrollBehavior
 import com.haooz.chedule.ui.basic.collapsibleTopInset
 import com.haooz.chedule.ui.screens.ClassEndEffectSettings
 import com.haooz.chedule.ui.screens.invalidateWeatherCache
+import com.haooz.chedule.ui.theme.KEY_MONET_COLOR
 import com.haooz.chedule.ui.utils.overScrollVertical
 import com.haooz.chedule.viewmodel.SettingsViewModel
 import top.yukonga.miuix.kmp.basic.Card
@@ -109,6 +111,7 @@ fun PreferenceSettingsScreen(
 
     val themePrefs = remember { context.getSharedPreferences("app_theme_prefs", Context.MODE_PRIVATE) }
     var themeMode by remember { mutableStateOf(themePrefs.getString("theme_mode", "system") ?: "system") }
+    var monetEnabled by remember { mutableStateOf(themePrefs.getBoolean(KEY_MONET_COLOR, false)) }
     // 自动（跟随系统）模式下，用系统当前主题决定高亮哪个色框
     val systemDark = isSystemInDarkTheme()
     val effectiveDark = when (themeMode) {
@@ -247,6 +250,20 @@ fun PreferenceSettingsScreen(
                                     }
                                 }
                             )
+                            SwitchPreference(
+                                title = "莫奈取色",
+                                summary = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                                    "跟随系统壁纸配色，支持浅色与深色模式"
+                                } else {
+                                    "需要 Android 12 及以上版本"
+                                },
+                                checked = monetEnabled && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S,
+                                enabled = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S,
+                                onCheckedChange = {
+                                    monetEnabled = it
+                                    themePrefs.edit { putBoolean(KEY_MONET_COLOR, it) }
+                                }
+                            )
                         }
                     }
                 }
@@ -367,7 +384,7 @@ fun PreferenceSettingsScreen(
                             )
                             SwitchPreference(
                                 title = "应用触感反馈",
-                                summary = "点击、滑动等操作产生的震动反馈",
+                                summary = "点击、滑动、底栏切换等操作的震动反馈",
                                 checked = hapticFeedbackEnabled,
                                 onCheckedChange = {
                                     hapticFeedbackEnabled = it
