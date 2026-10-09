@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 透明底单色轮廓，由启动器按系统壁纸配色着色；108dp 画布保留自适应图标安全区。 -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- 课表外框与镂空内容区，保留原图标的顶部横栏。 -->
+    <path
+        android:fillColor="#FF000000"
+        android:fillType="evenOdd"
+        android:pathData="M38,30 H70 C75.52,30 80,34.48 80,40 V70 C80,75.52 75.52,80 70,80 H38 C32.48,80 28,75.52 28,70 V40 C28,34.48 32.48,30 38,30 Z M38,41 C35.79,41 34,42.79 34,45 V70 C34,72.21 35.79,74 38,74 H70 C72.21,74 74,72.21 74,70 V45 C74,42.79 72.21,41 70,41 Z" />
+    <!-- 两行课表内容。 -->
+    <path
+        android:fillColor="#FF000000"
+        android:pathData="M42,48 H66 C67.1,48 68,48.9 68,50 V51 C68,52.1 67.1,53 66,53 H42 C40.9,53 40,52.1 40,51 V50 C40,48.9 40.9,48 42,48 Z M42,60 H56 C57.1,60 58,60.9 58,62 V63 C58,64.1 57.1,65 56,65 H42 C40.9,65 40,64.1 40,63 V62 C40,60.9 40.9,60 42,60 Z" />
+</vector>
