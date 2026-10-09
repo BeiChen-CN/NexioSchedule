@@ -253,7 +253,7 @@ fun PreferenceSettingsScreen(
                             SwitchPreference(
                                 title = "莫奈取色",
                                 summary = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                                    "跟随系统壁纸配色，支持浅色与深色模式"
+                                    "跟随系统壁纸配色，应用于背景、高亮与课程卡片"
                                 } else {
                                     "需要 Android 12 及以上版本"
                                 },

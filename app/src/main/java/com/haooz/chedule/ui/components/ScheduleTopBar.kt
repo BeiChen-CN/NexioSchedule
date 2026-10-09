@@ -31,6 +31,7 @@ import com.haooz.chedule.ui.basic.CollapsibleTopAppBarDefaults.CollapsedHeight
 import com.haooz.chedule.ui.basic.LiquidTopBarButton
 import com.haooz.chedule.ui.basic.ProgressiveBlurTopBar
 import com.haooz.chedule.ui.basic.SharedScrollBehavior
+import com.haooz.chedule.ui.theme.scheduleAccentColor
 import top.yukonga.miuix.kmp.basic.Text
 import top.yukonga.miuix.kmp.icon.MiuixIcons
 import top.yukonga.miuix.kmp.icon.basic.FastForward
@@ -222,7 +223,7 @@ private fun DayOfWeekRow(
             val isToday = dayOfWeek == currentDayOfWeek && isCurrentWeek &&
                 (!isReorganized || weekDates.getOrNull(index) == LocalDate.now())
 
-            val todayHighlightColor = Color(0xFF3482FF)
+            val todayHighlightColor = scheduleAccentColor()
             Box(
                 modifier = Modifier
                     .weight(1f)

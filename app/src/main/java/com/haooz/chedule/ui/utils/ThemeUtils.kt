@@ -16,6 +16,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import com.haooz.chedule.data.ScheduleAppearance
 import com.haooz.chedule.data.ThemeMode
+import top.yukonga.miuix.kmp.theme.MiuixTheme
+import top.yukonga.miuix.kmp.theme.platformDynamicColors
 
 // 壁纸强制主题：非 null 时 isAppDarkTheme 直接用该值，今日页/课程表页按壁纸亮暗锁定
 val LocalForcedDarkTheme = staticCompositionLocalOf<Boolean?> { null }
@@ -24,8 +26,10 @@ val LocalForcedDarkTheme = staticCompositionLocalOf<Boolean?> { null }
  * 课程表 / 排班页底色（无壁纸时铺满页面的那一层）。
  * 需要与页面底色对齐的元素统一取这里，不要各处抄 #F7F7F7 / #000000 字面量。
  */
+@Composable
 fun schedulePageBackgroundColor(isDark: Boolean): Color =
-    if (isDark) Color(0xFF000000) else Color(0xFFF7F7F7)
+    if (MiuixTheme.isDynamicColor) platformDynamicColors(dark = isDark).background
+    else if (isDark) Color(0xFF000000) else Color(0xFFF7F7F7)
 
 /** 无壁纸时课程卡垫底色的不透明度（浮层与网格卡片共用，保持两者观感一致） */
 private const val COURSE_CARD_BACKING_ALPHA = 0.92f
@@ -38,6 +42,7 @@ private const val COURSE_CARD_BACKING_ALPHA = 0.92f
  *
  * 网格里的课程卡与长按拖拽浮层统一取这里，避免两处各抄一份后漂移。
  */
+@Composable
 fun courseCardSolidBacking(isDark: Boolean, hasWallpaper: Boolean): Color? =
     if (hasWallpaper) null
     else schedulePageBackgroundColor(isDark).copy(alpha = COURSE_CARD_BACKING_ALPHA)

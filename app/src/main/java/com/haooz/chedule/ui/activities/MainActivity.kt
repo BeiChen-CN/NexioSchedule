@@ -2617,19 +2617,24 @@ fun CourseScheduleApp(privacyConsented: Boolean = true) {
         // 必须 remember 出稳定 List，否则 equals 失败会强制录制。
         // 用 pager 当前页而非 selectedTab：点击后 selectedTab 先变，真正像素落定在 currentPage。
         // pagerState.currentPage：无壁纸周滑跳过 mustRecord 后，靠落页变 key 补录。
+        val themeBackdropKey = listOf(
+            MiuixTheme.isDynamicColor, MiuixTheme.colorScheme.background,
+            MiuixTheme.colorScheme.primary, MiuixTheme.colorScheme.secondaryContainer,
+            MiuixTheme.colorScheme.tertiaryContainer,
+        )
         val liquidGlassRecordKey = remember(
             mainPagerState.currentPage, isShiftMode, showDetail, showCustomizePage, showSwitchSchedule,
             isWindowCutoutActive, shortcutMenuVisible, isDraggingCard, floatingCardVisible,
             dataVersion, currentWeek, totalWeeks, currentCombinationIndex, effectiveIsDark,
             wallpaperBitmap, com.haooz.chedule.ui.components.TabletNavSideState.expanded, scheduleShowCourseDetail.value,
-            pagerState.currentPage
+            pagerState.currentPage, themeBackdropKey
         ) {
             listOf(
                 mainPagerState.currentPage, isShiftMode, showDetail, showCustomizePage, showSwitchSchedule,
                 isWindowCutoutActive, shortcutMenuVisible, isDraggingCard, floatingCardVisible,
                 dataVersion, currentWeek, totalWeeks, currentCombinationIndex, effectiveIsDark,
                 wallpaperBitmap, com.haooz.chedule.ui.components.TabletNavSideState.expanded, scheduleShowCourseDetail.value,
-                pagerState.currentPage
+                pagerState.currentPage, themeBackdropKey
             )
         }
         // 局部 val 不能直接捕获进 remember lambda，一律经 rememberUpdatedState
@@ -4489,7 +4494,7 @@ fun CourseScheduleApp(privacyConsented: Boolean = true) {
         val overlayPageController = rememberAppThemeController(isDark = overlayEffectiveDark)
         // 无壁纸时浮层垫课程表页底色（与网格课程卡同一份，取值见 courseCardSolidBacking）
         val floatSolidBacking = courseCardSolidBacking(
-            isDark = isAppDarkTheme(),
+            isDark = overlayEffectiveDark,
             hasWallpaper = wallpaperBitmap != null
         )
         // 拖浮层跟手高光的中心（px，非 state：只在 draw 里写，不触发额外失效）
